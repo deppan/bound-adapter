@@ -4,7 +4,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 
 abstract class BoundAdapter<T, VDB : ViewDataBinding>(callback: DiffUtil.ItemCallback<T>) :
-    BaseAdapter<T, BoundViewHolder<VDB>>(callback) {
+    DiffAdapter<T, BoundViewHolder<VDB>>(callback) {
 
     override fun onBindViewHolder(holder: BoundViewHolder<VDB>, position: Int) {
         bindTo(holder, getItem(position))
