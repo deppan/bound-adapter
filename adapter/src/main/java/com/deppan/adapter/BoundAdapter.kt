@@ -1,23 +1,22 @@
 package com.deppan.adapter
 
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 
-abstract class BoundAdapter<T, VDB : ViewDataBinding>(callback: DiffUtil.ItemCallback<T>) :
-    DiffAdapter<T, BoundViewHolder<VDB>>(callback) {
+abstract class BoundAdapter<T>(callback: DiffUtil.ItemCallback<T>) :
+    DiffAdapter<T, BoundViewHolder>(callback) {
 
-    override fun onBindViewHolder(holder: BoundViewHolder<VDB>, position: Int) {
+    override fun onBindViewHolder(holder: BoundViewHolder, position: Int) {
         bindTo(holder, getItem(position))
-        holder.binding.executePendingBindings()
+        holder.ui.executePendingBindings()
     }
 
     override fun onBindViewHolder(
-        holder: BoundViewHolder<VDB>,
+        holder: BoundViewHolder,
         position: Int,
         payloads: MutableList<Any>
     ) = bindTo(holder, getItem(position), payloads)
 
-    open fun bindTo(holder: BoundViewHolder<VDB>, item: T, payloads: MutableList<Any>) {}
+    open fun bindTo(holder: BoundViewHolder, item: T, payloads: MutableList<Any>) {}
 
-    abstract fun bindTo(holder: BoundViewHolder<VDB>, item: T)
+    abstract fun bindTo(holder: BoundViewHolder, item: T)
 }

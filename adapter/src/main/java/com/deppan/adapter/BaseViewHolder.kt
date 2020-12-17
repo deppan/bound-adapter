@@ -3,4 +3,4 @@ package com.deppan.adapter
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view)
+open class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view)
