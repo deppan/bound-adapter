@@ -1,6 +1,10 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+  id 'com.android.library'
+  id 'kotlin-android'
+  id 'kotlin-kapt'
+  id 'maven-publish'
+  id 'com.jfrog.bintray'
+}
 
 android {
   compileSdkVersion 30
@@ -9,8 +13,6 @@ android {
   defaultConfig {
     minSdkVersion 23
     targetSdkVersion 30
-    versionCode 1
-    versionName "0.1.0"
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles "consumer-rules.pro"
@@ -23,18 +25,51 @@ android {
     }
   }
 
-  lintOptions {
-    abortOnError false
+  buildFeatures {
+    dataBinding true
   }
 
-  dataBinding {
-    enabled = true
+  lintOptions {
+    abortOnError false
   }
 }
 
 dependencies {
-  implementation 'androidx.recyclerview:recyclerview:1.1.0'
+  compileOnly 'androidx.recyclerview:recyclerview:1.1.0'
   testImplementation 'junit:junit:4.13.1'
   androidTestImplementation 'androidx.test.ext:junit:1.1.2'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+
+afterEvaluate {
+  publishing {
+    publications {
+      release(MavenPublication) {
+        from components.release
+
+        groupId = 'com.deppan.adapter'
+        artifactId = 'BoundAdapter'
+        version = '0.2.0'
+      }
+    }
+  }
+}
+
+bintray {
+  user = project.property('bintray.user')
+  key = project.property('bintray.token')
+  publications = ['release']
+  publish = true
+  override = true
+  pkg {
+    repo = 'Granary'
+    name = 'BoundAdapter'
+    desc = 'Here is my library description'
+    licenses = ['Apache-2.0']
+    vcsUrl = 'https://github.com/deppan/bound-adapter'
+    version {
+      name = '0.2.0'
+      released = new Date()
+    }
+  }
 }
