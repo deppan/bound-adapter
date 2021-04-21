@@ -6,7 +6,7 @@
 
     <variable
       name="person"
-      type="com.deppan.adapter.app.Person" />
+      type="io.github.deppan.adapter.app.Person" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout

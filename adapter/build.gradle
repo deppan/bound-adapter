@@ -3,7 +3,6 @@ plugins {
   id 'kotlin-android'
   id 'kotlin-kapt'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
 }
 
 android {
@@ -21,7 +20,6 @@ android {
   buildTypes {
     release {
       minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
   }
 
@@ -35,10 +33,52 @@ android {
 }
 
 dependencies {
-  compileOnly 'androidx.recyclerview:recyclerview:1.1.0'
+  compileOnly 'androidx.recyclerview:recyclerview:1.2.0'
   testImplementation 'junit:junit:4.13.1'
   androidTestImplementation 'androidx.test.ext:junit:1.1.2'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+
+task generateSourcesJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
+
+static def release() {
+  return "https://s01.oss.sonatype.org/content/repositories/releases"
+}
+
+static def snapshot() {
+  return "https://s01.oss.sonatype.org/content/repositories/snapshots"
+}
+
+static def branch() {
+  return 'git symbolic-ref --short -q HEAD'.execute().text.trim()
+}
+
+static def latestTag() {
+  def tag = 'git describe --tags'.execute().text.trim()
+  if (tag.startsWith('v'))
+    return tag.substring(1)
+  else {
+    return tag
+  }
+}
+
+static def publishUrl() {
+  if ("master".equalsIgnoreCase(branch())) {
+    return release()
+  } else {
+    return snapshot()
+  }
+}
+
+static def versionName() {
+  if ("master".equalsIgnoreCase(branch())) {
+    return latestTag()
+  } else {
+    return latestTag() + "-SNAPSHOT"
+  }
 }
 
 afterEvaluate {
@@ -47,29 +87,20 @@ afterEvaluate {
       release(MavenPublication) {
         from components.release
 
-        groupId = 'com.deppan.adapter'
-        artifactId = 'BoundAdapter'
-        version = '0.2.0'
+        groupId = "io.github.deppan.adapter"
+        artifactId = "BoundAdapter"
+        version = versionName()
+        artifact generateSourcesJar
       }
     }
-  }
-}
-
-bintray {
-  user = project.property('bintray.user')
-  key = project.property('bintray.token')
-  publications = ['release']
-  publish = true
-  override = true
-  pkg {
-    repo = 'Granary'
-    name = 'BoundAdapter'
-    desc = 'Here is my library description'
-    licenses = ['Apache-2.0']
-    vcsUrl = 'https://github.com/deppan/bound-adapter'
-    version {
-      name = '0.2.0'
-      released = new Date()
+    repositories {
+      maven {
+        credentials {
+          url = publishUrl()
+          username = project.property('maven.username')
+          password = project.property('maven.password')
+        }
+      }
     }
   }
 }
